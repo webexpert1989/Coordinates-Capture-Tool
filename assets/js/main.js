@@ -6,7 +6,6 @@
 	$.extend({
 		coordinates: {slots:{}},
 		imageScale: 1,
-		selectable: false,
 
 		// init
 		init: function() {
@@ -94,18 +93,14 @@
 
 		// muse mouse move event
 		$(document).on("mousemove", "#parking-plan", function(e) {
-			if(!$.selectable) {
-				var offset = $(this).offset();
-				$.reset_point(
-					e.clientX - offset.left,
-					e.clientY - offset.top
-				);
-			}
+			var offset = $(this).offset();
+			$.reset_point(
+				e.clientX - offset.left,
+				e.clientY - offset.top
+			);
 		});
 		
 		$(document).on("click", "#parking-plan", function(e) {
-			$.selectable = true;
-		
 			var offset = $(this).offset(),
 				coordinate = $.reset_point(
 					e.clientX - offset.left,
@@ -122,6 +117,9 @@
 
 			// save json to textarea
 			$("#coordinates").val(JSON.stringify($.coordinates));
+
+			// increase id
+			$("#incremental-id").val(parseInt(id) + 1);
 		});
 
 			// save json
