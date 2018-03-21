@@ -6,17 +6,18 @@
 	$.extend({
 		coordinates: {slots:{}},
 		imageScale: 1,
+		imageWidth: 0,
 
 		// init
 		init: function() {
 			// add point to plan
 			$("<div>").appendTo("#parking-plan").addClass("point");
 
+			// reset scale
+			$.reset_image_scale();
+
 			// init point
 			$.reset_point(0, 0);
-
-			// loaded
-			$(".wrap").addClass("loaded");
 		},
 
 		// reset point coordinate funciton
@@ -72,24 +73,57 @@
 	
 				document.body.removeChild(element);
 			}
+		},
+
+		// reset image scale
+		reset_image_scale: function() {
+			$.imageScale = $.imageWidth / $("#parking-plan img").width();
+		},
+
+		// read url of selected image
+
+		read_url: function(input, callback) {
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+
+				reader.onload = function (e) {
+					if(callback) {
+						callback(e.target.result);
+					}
+				}
+
+				reader.readAsDataURL(input.files[0]);
+			}
 		}
 	});
 
 	////////////////////////////
 
 	$(document).ready(function() {
-		// image scale
-		var plan = $("#parking-plan"),
-		planImg = plan.children("img"),
-		resizedWidth = planImg.width();
-	
-		$("<img/>") // Make in memory copy of image to avoid css issues
-			.attr("src", planImg.attr("src"))
-			.load(function() {
-				$.imageScale = this.width / resizedWidth;
-				$.init();
-			});
 
+		// upload image
+		$(document).on("change", "#plan-image", function(e) {
+			e.preventDefault();
+
+			$.read_url(this, function(src) {
+				$("<img>").prependTo("#parking-plan").attr("src", src);
+				$("#parking-plan .no-image").remove();
+
+				// image scale
+				var planImg = $("#parking-plan").children("img");
+			
+				$(".wrap").addClass("loading");
+				$("<img/>") // Make in memory copy of image to avoid css issues
+					.attr("src", src)
+					.load(function() {
+						$(".wrap").removeClass("loading");
+						$(".coordinates-form").addClass("active");
+
+						$.imageWidth = this.width;
+						$.init();
+					});
+			});
+		});
 
 		// muse mouse move event
 		$(document).on("mousemove", "#parking-plan", function(e) {
@@ -101,6 +135,11 @@
 		});
 		
 		$(document).on("click", "#parking-plan", function(e) {
+			if($.imageWidth == 0) {
+				return;
+			}
+
+			//////
 			var offset = $(this).offset(),
 				coordinate = $.reset_point(
 					e.clientX - offset.left,
@@ -121,12 +160,45 @@
 			// increase id
 			$("#incremental-id").val(parseInt(id) + 1);
 		});
+		
+		$(document).on("click", "#remove-last-coordinate", function(e) {
+
+			var slots = [];
+			for(var i in $.coordinates.slots) {
+				slots.push({
+					id: i,
+					val: $.coordinates.slots[i]
+				});
+			}
+
+			slots.pop();
+			$.coordinates.slots = {};
+			for(var i in slots) {
+				$.coordinates.slots[slots[i].id] = slots[i].val;
+			}
+
+			// save json to textarea
+			$("#coordinates").val(JSON.stringify($.coordinates));
+		});
 
 			// save json
 		$(document).on("click", "#download-coordinate", function(e) {
 			$.save_text_as_file("Coordinates.json", $("#coordinates").val());
 		});
 		////////////
+
+		$(document).on("submit", "#protection-form", function(e) {
+			e.preventDefault();
+
+			if($("#passwd").val()) {
+				$(this).closest(".protection").removeClass("active");
+				$(".app-wrap").addClass("active");
+			}
+		})
 	});
+
+	$(window).resize(function() {
+		$.reset_image_scale();
+	})
 
 })(jQuery);

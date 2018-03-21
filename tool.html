@@ -26,11 +26,24 @@
 				</div>
 			</header>
 
+			<div class="protection active">
+				<form id="protection-form" class="protection-form">
+					<div class="form-group">
+						<input type="password" class="form-control" id="passwd" placeholder="Password">
+					</div>
+					<button type="submit" class="btn btn-primary form-control">Login</button>
+				</form>
+			</div>
+
 			<div class="app-wrap">
 				<div class="container">
 					<div id="parking-plan" class="parking-plan">
-						<img src="./pucture.jpg">
+						<div class="no-image">
+							<span>No Image</span>
+							<input type="file" id="plan-image">
+						</div>
 					</div>
+
 					<div class="row coordinates-form">
 						<div class="col-md-6">
 							<label>Incremental ID: <input type="number" id="incremental-id" class="form-control" value="1"></label> 
@@ -38,7 +51,8 @@
 						</div>
 						<div class="col-md-6">
 							<label>Added Coordinates: <textarea id="coordinates" class="form-control" readonly></textarea></label>
-							<button id="download-coordinate" class="btn btn-primary">Download Coordinates by JSON format</button>
+							<button id="download-coordinate" class="btn btn-primary">Download by JSON</button>
+							<button id="remove-last-coordinate" class="btn btn-warning">Remove Last Point</button>
 						</div>
 					</div>
 				</div>
