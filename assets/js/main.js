@@ -22,8 +22,8 @@
 
 		// reset point coordinate funciton
 		reset_point: function(x, y) {
-			x = parseInt(x);
-			y = parseInt(y);
+			x = parseInt(x) + $(document).scrollLeft();
+			y = parseInt(y) + $(document).scrollTop();
 	
 			$("#parking-plan .point").css({
 				top: y + "px",
@@ -37,8 +37,10 @@
 			var text = $("#coordinate").data("tpl").replace(/\{\{x\}\}/g, x).replace(/\{\{y\}\}/g, y);
 			$("#coordinate").text(text);
 	
-			// save point coordinate
-			$("#parking-plan").attr({"data-x": x, "data-y": y});
+			return {
+				x: x,
+				y: y
+			};
 		},
 
 		// Saves a text string as a blob file
@@ -104,33 +106,22 @@
 		$(document).on("click", "#parking-plan", function(e) {
 			$.selectable = true;
 		
-			var offset = $(this).offset();
-			$.reset_point(
-				e.clientX - offset.left,
-				e.clientY - offset.top
-			);
-		});
-		
-		$(document).on("click", "#add-coordinate", function(e) {
-			var id = $("#incremental-id").val(),
-				x = $("#parking-plan").data("x"),
-				y = $("#parking-plan").data("y");
-			
+			var offset = $(this).offset(),
+				coordinate = $.reset_point(
+					e.clientX - offset.left,
+					e.clientY - offset.top
+				),
+				id = $("#incremental-id").val();
+
 			if(!id) {
-				alert("Enter Incremental ID");
 				return;
-			}
+			}			
 			
 			// push data
-			$.coordinates.slots[id] = [x, y];
+			$.coordinates.slots[id] = [coordinate.x, coordinate.y];
 
 			// save json to textarea
 			$("#coordinates").val(JSON.stringify($.coordinates));
-
-			// cleanup data
-			$.reset_point(0, 0);
-			$("#incremental-id").val("");
-			$.selectable = false;
 		});
 
 			// save json
