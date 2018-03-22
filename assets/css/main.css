@@ -89,6 +89,7 @@ header .logo-wrap {
 	position: relative;
 	border: 1px solid rgba(0,0,0,.6);
 	overflow: hidden;
+	cursor: none;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	-o-border-radius: 4px;

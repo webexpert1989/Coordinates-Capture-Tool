@@ -171,7 +171,7 @@
 				});
 			}
 
-			slots.pop();
+			var lastSlot = slots.pop();
 			$.coordinates.slots = {};
 			for(var i in slots) {
 				$.coordinates.slots[slots[i].id] = slots[i].val;
@@ -179,6 +179,9 @@
 
 			// save json to textarea
 			$("#coordinates").val(JSON.stringify($.coordinates));
+
+			// reset id
+			$("#incremental-id").val(lastSlot.id);
 		});
 
 			// save json
